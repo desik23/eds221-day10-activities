@@ -92,5 +92,16 @@ There is a generally decreasing trend as the mean air temperature increases, the
 
 ```{r}
 
+post1970_ice_data <- ice_data %>%
+  filter(year4 >= 1970) %>%
+  mutate(ice_off = lubridate::ymd(ice_off)) %>% 
+  mutate(yearday = lubridate::yday(ice_off))
+
+
+ggplot(data = post1970_ice_data, aes(x = year4, y = yearday)) +
+  geom_point() +
+  geom_line()
+
 ```
 
+There is no significant observable trend in the ice off day of the year as the years increase. 
