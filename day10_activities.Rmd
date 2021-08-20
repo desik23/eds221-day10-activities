@@ -1,0 +1,96 @@
+---
+title: "North Temperate Lakes LTER"
+author: "Desik Somasundaram"
+date: "8/20/2021"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyverse)
+library(here)
+library(janitor)
+```
+
+## Read in data
+
+```{r}
+ice_data <- read_csv(here("data", "ntl33_v7.csv" ), na = "-999")
+met_data <- read_csv(here("data", "ntl20_v6.csv" ))
+
+```
+## Ice Duration visualization
+
+```{r}
+ggplot(data = ice_data, aes(x = lakeid, y = ice_duration)) +
+  geom_violin(fill = NA) +
+  geom_jitter(aes(color = lakeid), width = 0.2) 
+  
+```
+## Find mean ice cover duration
+
+```{r}
+ice_duration_yearly <- ice_data %>%
+  rename(year= year4) %>% 
+  group_by(year) %>% 
+  summarize(mean_ice_duration = mean(ice_duration , na.rm = TRUE))
+  
+```
+
+## Exploring Mean Ice Cover Duration
+
+```{r}
+ggplot(data = ice_duration_yearly, aes(x = year, y = mean_ice_duration)) +
+  geom_point() +
+  geom_line()
+  
+```
+The mean ice duration indicates that the duration by year is generally cyclic with a general decreasing trend. 
+
+## Mean Air Temperature 
+
+```{r}
+mean_winter <- met_data %>% 
+  filter(month %in% c(12, 1, 2)) %>% 
+  rename(year= year4) %>% 
+  group_by(year) %>% 
+  summarize(mean_airtemp_c = mean(ave_air_temp_adjusted, na.rm = TRUE))
+
+```
+
+## Exploring Mean Air Temp
+
+```{r}
+ggplot(data = mean_winter, aes(x = year, y = mean_airtemp_c)) +
+  geom_point() +
+  geom_line()
+  
+```
+
+
+The mean air temperature indicates that the air temperature by year generally fluctuates drastically with a general increasing trend. 
+
+## Joining air temperature and ice duration
+
+```{r}
+met_ice_mean <- left_join(mean_winter, ice_duration_yearly)
+```
+## Exploring Mean Air Temp and Duration Relationship
+
+```{r}
+ggplot(data = met_ice_mean, aes(x = mean_airtemp_c, y =  mean_ice_duration)) +
+  geom_point() 
+
+  
+```
+
+There is a generally decreasing trend as the mean air temperature increases, the mean ice duration decrease. However, the correlation is weak. 
+
+
+## Exploring Thaw Dates
+
+
+```{r}
+
+```
+
